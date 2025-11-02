@@ -1,0 +1,39 @@
+.nav ul li {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Menu con ẩn mặc định */
+.dropdown-menu {
+  display: none;              /* Ẩn */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  color: black;
+  min-width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  z-index: 1000;
+
+  /* Bố cục 2 cột */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+/* Style item con */
+.dropdown-menu li {
+  padding: 8px;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.dropdown-menu li:hover {
+  background: #f1f1f1;
+}
+
+/* Khi hover vào menu cha thì mới hiển thị menu con */
+.dropdown:hover .dropdown-menu {
+  display: grid;   /* Lúc này mới bật grid */
+}

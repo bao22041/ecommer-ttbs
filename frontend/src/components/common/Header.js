@@ -1,5 +1,6 @@
 // src/components/common/Header.js
 import React from "react";
+import { Link } from "react-router-dom";   // 👉 import Link
 import "./Header.css";
 
 export default function Header() {
@@ -9,12 +10,12 @@ export default function Header() {
 
       <nav className="nav">
         <ul>
-          <li><span>Trang chủ</span></li>
-          <li><span>Giới thiệu</span></li>
-          <li><span>Tin tức</span></li>
-          <li><span>Liên hệ</span></li>
-          <li><span>Giỏ hàng</span></li>
-          <li><span>Yêu thích</span></li> {/* 👉 thêm mục này */}
+          <li><Link to="/">Trang chủ</Link></li>
+          <li><Link to="/about">Giới thiệu</Link></li>
+          <li><Link to="/news">Tin tức</Link></li>
+          <li><Link to="/contact">Liên hệ</Link></li>
+          <li><Link to="/cart">Giỏ hàng</Link></li>
+          <li><Link to="/wishlist">Yêu thích</Link></li>
 
           {/* Sản phẩm */}
           <li className="dropdown">
@@ -48,8 +49,8 @@ export default function Header() {
           <li className="dropdown">
             <span>Tài khoản</span>
             <ul className="dropdown-menu">
-              <li>Đăng nhập</li>
-              <li>Đăng ký</li>
+              <li><Link to="/login">Đăng nhập</Link></li>
+              <li><Link to="/register">Đăng ký</Link></li>
             </ul>
           </li>
         </ul>

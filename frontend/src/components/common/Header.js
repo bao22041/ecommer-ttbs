@@ -1,9 +1,12 @@
 // src/components/common/Header.js
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import "./Header.css";
+import { AuthContext } from "../../context/AuthContext";
 
-export default function Header({ user, onLogout }) {
+export default function Header() {
+  const { user, logout } = useContext(AuthContext);
+
   return (
     <header className="header">
       <div className="logo">TTBS</div>
@@ -49,10 +52,10 @@ export default function Header({ user, onLogout }) {
           <li className="dropdown">
             {user ? (
               <>
-                <span>{user.username}</span>
+                <span>👤 {user.username}</span>
                 <ul className="dropdown-menu">
                   <li>
-                    <button className="dropdown-item" onClick={onLogout}>
+                    <button className="dropdown-item" onClick={logout}>
                       Đăng xuất
                     </button>
                   </li>

@@ -13,6 +13,12 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const perPage = 8;
+  const [showChat, setShowChat] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    { from: "bot", text: "Xin chào 👋! Tôi có thể giúp bạn tìm sản phẩm." }
+  ]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
     axios
@@ -59,6 +65,28 @@ export default function HomePage() {
     if (cat === "Tất cả") setFiltered(products);
     else setFiltered(products.filter((p) => p.category === cat));
     setPage(1);
+  };
+
+  // 👉 Hàm gửi tin nhắn chatbot
+  const sendChatMessage = async () => {
+    if (!chatInput.trim()) return;
+    const newMessages = [...chatMessages, { from: "user", text: chatInput }];
+    setChatMessages(newMessages);
+    setChatInput("");
+    setChatLoading(true);
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/chatbot/chat", {
+        message: chatInput,
+      });
+      const reply = res.data.reply || "Xin lỗi, tôi chưa hiểu.";
+      setChatMessages([...newMessages, { from: "bot", text: reply }]);
+    } catch (err) {
+      console.error("❌ Lỗi chatbot:", err);
+      setChatMessages([...newMessages, { from: "bot", text: "Có lỗi xảy ra khi gọi chatbot." }]);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   const handleAddToCart = async (product, qty = 1) => {
@@ -160,6 +188,84 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+      {/* 👉 Nút nổi mở chatbot */}
+      <button
+        className="btn btn-primary"
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          borderRadius: "50%",
+          width: "60px",
+          height: "60px",
+        }}
+        onClick={() => setShowChat(!showChat)}
+      >
+        💬
+      </button>
+      {/* 👉 Khung chat */}
+      {showChat && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "90px",
+            right: "20px",
+            width: "300px",
+            height: "400px",
+            border: "1px solid #ccc",
+            borderRadius: "10px",
+            background: "#fff",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              flex: 1,
+              padding: "10px",
+              overflowY: "auto",
+              background: "#f9f9f9",
+            }}
+          >
+            {chatMessages.map((msg, idx) => (
+              <div
+                key={idx}
+                style={{
+                  textAlign: msg.from === "user" ? "right" : "left",
+                  margin: "5px 0",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    padding: "6px 10px",
+                    borderRadius: "10px",
+                    background: msg.from === "user" ? "#007bff" : "#e0e0e0",
+                    color: msg.from === "user" ? "#fff" : "#000",
+                  }}
+                >
+                  {msg.text}
+                </span>
+              </div>
+            ))}
+            {chatLoading && <p>Đang trả lời...</p>}
+          </div>
+          <div style={{ display: "flex", padding: "10px" }}>
+            <input
+              type="text"
+              className="form-control"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendChatMessage()}
+              placeholder="Nhập tin nhắn..."
+            />
+            <button className="btn btn-primary ms-2" onClick={sendChatMessage}>
+              Gửi
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {/* Danh sách sản phẩm phân trang */}
       <div className="container my-4">

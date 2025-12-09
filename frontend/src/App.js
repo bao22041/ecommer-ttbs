@@ -1,5 +1,5 @@
 // src/App.js
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import ProductsPage from "./features/products/ProductsPage";
@@ -15,7 +15,20 @@ import CartPage from "./pages/CartPage";
 import VoucherPage from "./pages/VoucherPage";
 import AccountPage from "./pages/AccountPage";
 
+
 function App() {
+  const [user, setUser] = useState(null);
+
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);
+    localStorage.setItem("token", userData.token);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("token");
+  };
+
   return (
     <Router>
       <main style={{ minHeight: "80vh", padding: "20px" }}>
@@ -30,7 +43,10 @@ function App() {
           <Route path="/account" element={<AccountPage />} />
 
           {/* Auth */}
-          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/login"
+            element={<LoginPage onLoginSuccess={handleLoginSuccess} />}
+          />
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Admin */}

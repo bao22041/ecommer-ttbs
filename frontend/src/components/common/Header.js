@@ -1,9 +1,9 @@
 // src/components/common/Header.js
 import React from "react";
-import { Link } from "react-router-dom";   // 👉 import Link
+import { Link } from "react-router-dom";
 import "./Header.css";
 
-export default function Header() {
+export default function Header({ user, onLogout }) {
   return (
     <header className="header">
       <div className="logo">TTBS</div>
@@ -47,11 +47,26 @@ export default function Header() {
 
           {/* Tài khoản */}
           <li className="dropdown">
-            <span>Tài khoản</span>
-            <ul className="dropdown-menu">
-              <li><Link to="/login">Đăng nhập</Link></li>
-              <li><Link to="/register">Đăng ký</Link></li>
-            </ul>
+            {user ? (
+              <>
+                <span>{user.username}</span>
+                <ul className="dropdown-menu">
+                  <li>
+                    <button className="dropdown-item" onClick={onLogout}>
+                      Đăng xuất
+                    </button>
+                  </li>
+                </ul>
+              </>
+            ) : (
+              <>
+                <span>Tài khoản</span>
+                <ul className="dropdown-menu">
+                  <li><Link to="/login">Đăng nhập</Link></li>
+                  <li><Link to="/register">Đăng ký</Link></li>
+                </ul>
+              </>
+            )}
           </li>
         </ul>
       </nav>

@@ -61,6 +61,20 @@ export default function HomePage() {
     setPage(1);
   };
 
+  const handleAddToCart = async (product, qty = 1) => {
+  try {
+    await axios.post("http://localhost:5000/api/cart", {
+      user_id: 1, // giả định user_id=1
+      product_id: product.id,
+      quantity: qty,
+    });
+    alert(`Đã thêm ${qty} x ${product.name} vào giỏ hàng`);
+  } catch (err) {
+    console.error("Lỗi thêm giỏ hàng:", err);
+    alert("Không thể thêm vào giỏ hàng");
+  }
+};
+
   const featured = [...products].sort((a, b) => b.price - a.price).slice(0, 4);
   const totalPages = Math.ceil(filtered.length / perPage);
   const paginated = filtered.slice((page - 1) * perPage, page * perPage);
@@ -97,7 +111,7 @@ export default function HomePage() {
         <h4 className="mb-4">🔥 Sản phẩm nổi bật</h4>
         <div className="row g-4">
           {featured.map((p) => (
-            <div key={p._id} className="col-12 col-sm-6 col-md-3">
+            <div key={p.id} className="col-12 col-sm-6 col-md-3">
               <div className="card h-100 border-warning shadow-sm">
                 <img
                   src={p.image}
@@ -113,9 +127,30 @@ export default function HomePage() {
                   {ratings[p.id] && (
                     <small className="text-muted">⭐ {ratings[p.id]} / 5</small>
                   )}
+                  <div className="d-flex align-items-center mt-2">
+                    <input
+                      type="number"
+                      min="1"
+                      defaultValue="1"
+                      className="form-control me-2"
+                      style={{ width: "70px" }}
+                      id={`qty-${p.id}`}
+                    />
+                    <button
+                      className="btn btn-sm btn-warning"
+                      onClick={() =>
+                        handleAddToCart(
+                          p,
+                          parseInt(document.getElementById(`qty-${p.id}`).value)
+                        )
+                      }
+                    >
+                      🛒 Thêm vào giỏ
+                    </button>
+                  </div>
                   <Link
-                    to={`/product/${p._id}`}
-                    className="btn btn-outline-warning mt-auto"
+                    to={`/product/${p.id}`}
+                    className="btn btn-outline-warning mt-2"
                   >
                     Xem chi tiết
                   </Link>
@@ -126,6 +161,7 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Danh sách sản phẩm phân trang */}
       <div className="container my-4">
         {loading ? (
           <div className="text-center py-5">
@@ -142,7 +178,7 @@ export default function HomePage() {
           <>
             <div className="row g-4">
               {paginated.map((p) => (
-                <div key={p._id} className="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div key={p.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
                   <div className="card h-100 shadow-sm">
                     <img
                       src={p.image}
@@ -160,9 +196,30 @@ export default function HomePage() {
                           ⭐ {ratings[p.id]} / 5
                         </small>
                       )}
+                      <div className="d-flex align-items-center mt-2">
+                        <input
+                          type="number"
+                          min="1"
+                          defaultValue="1"
+                          className="form-control me-2"
+                          style={{ width: "70px" }}
+                          id={`qty-${p.id}`}
+                        />
+                        <button
+                          className="btn btn-sm btn-primary"
+                          onClick={() =>
+                            handleAddToCart(
+                              p,
+                              parseInt(document.getElementById(`qty-${p.id}`).value)
+                            )
+                          }
+                        >
+                          🛒 Thêm vào giỏ
+                        </button>
+                      </div>
                       <Link
-                        to={`/product/${p._id}`}
-                        className="btn btn-outline-primary mt-auto"
+                        to={`/product/${p.id}`}
+                        className="btn btn-outline-primary mt-2"
                       >
                         Xem chi tiết
                       </Link>

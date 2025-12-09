@@ -19,16 +19,16 @@ export default function RegisterPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:5000/api/auth/register", form);
-      setSuccess("Đăng ký thành công! Hãy đăng nhập.");
-      setError("");
-      setTimeout(() => navigate("/login"), 1500);
-    } catch (err) {
-      setError("Đăng ký thất bại. Vui lòng thử lại.");
-    }
-  };
+  e.preventDefault();
+  try {
+    const res = await axios.post("http://localhost:5000/api/auth/register", form);
+    setSuccess(res.data.message || "Đăng ký thành công! Hãy đăng nhập.");
+    setError("");
+    setTimeout(() => navigate("/login"), 1500);
+  } catch (err) {
+    setError(err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+  }
+};
 
   return (
     <div style={{ padding: "20px" }}>

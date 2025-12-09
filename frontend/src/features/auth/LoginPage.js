@@ -19,14 +19,21 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", form);
-      // Backend trả về { token, user: { username, role } }
-      login(res.data.user); 
+
+      // 👉 Lưu token vào localStorage
+      localStorage.setItem("token", res.data.token);
+
+      // 👉 Cập nhật user vào context
+      login(res.data.user);
+
+      // 👉 Điều hướng theo role
       if (res.data.user.role === "admin") {
         navigate("/admin/products");
       } else {
         navigate("/");
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError("Sai tài khoản hoặc mật khẩu");
     }
   };

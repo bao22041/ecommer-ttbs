@@ -1,9 +1,16 @@
 // backend/middleware/roleMiddleware.js
-module.exports = (roles) => {
+function roleMiddleware(requiredRole) {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'Bạn không có quyền truy cập' });
+    if (!req.user) {
+      return res.status(401).json({ message: "Chưa xác thực" });
     }
+
+    if (req.user.role !== requiredRole) {
+      return res.status(403).json({ message: "Không có quyền truy cập" });
+    }
+
     next();
   };
-};
+}
+
+module.exports = roleMiddleware;

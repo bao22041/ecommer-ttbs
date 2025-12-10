@@ -1,4 +1,5 @@
-const db = require('../config/db');
+//const db = require('../config/db');
+const VoucherModel = require('../models/voucherModel');
 
 // Lấy danh sách voucher
 exports.getVouchers = (req, res) => {
@@ -60,4 +61,55 @@ exports.deleteVoucher = (req, res) => {
     }
     res.json({ message: 'Xóa voucher thành công' });
   });
+};
+
+// Áp dụng voucher
+exports.applyVoucher = async (req, res) => {
+  try {
+    const { code, cartTotal } = req.body;
+
+    // Debug log để kiểm tra dữ liệu nhận được
+    console.log("📥 Dữ liệu nhận được:", req.body);
+
+    // Kiểm tra đầu vào
+    if (!code?.trim()) {
+      return res.status(400).json({ message: "Thiếu mã voucher" });
+    }
+    if (typeof cartTotal !== "number" || cartTotal <= 0) {
+      return res.status(400).json({ message: "Tổng giỏ hàng không hợp lệ" });
+    }
+
+    // Tìm voucher theo mã
+    const voucher = await VoucherModel.findByCode(code.trim());
+
+    if (!voucher) {
+      return res.status(404).json({ message: "Mã voucher không hợp lệ" });
+    }
+
+    // Kiểm tra hạn sử dụng
+    if (voucher.expiry_date && new Date(voucher.expiry_date) < new Date()) {
+      return res.status(400).json({ message: "Voucher đã hết hạn" });
+    }
+
+    // Tính toán giảm giá
+    const discount = voucher.discount || 0;
+    const discountAmount = (cartTotal * discount) / 100;
+    const newTotal = cartTotal - discountAmount;
+
+    // Trả về kết quả
+    res.json({
+      message: "Áp dụng voucher thành công",
+      discount,                
+      discountAmount: Math.round(discountAmount),
+      voucher_id: voucher.id,
+      originalTotal: cartTotal,
+      newTotal: Math.round(newTotal),
+    });
+  } catch (err) {
+    console.error("❌ Lỗi applyVoucher:", err);
+    res.status(500).json({
+      message: "Có lỗi xảy ra trong hệ thống",
+      error: err.message,
+    });
+  }
 };

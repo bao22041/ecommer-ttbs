@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
@@ -88,11 +88,10 @@ export default function HomePage() {
       setChatLoading(false);
     }
   };
-
   const handleAddToCart = async (product, qty = 1) => {
   try {
-    await axios.post("http://localhost:5000/api/cart", {
-      user_id: 1, // giả định user_id=1
+    await axios.post(`http://localhost:5000/api/cart/add`, {
+      user_id: 1,
       product_id: product.id,
       quantity: qty,
     });

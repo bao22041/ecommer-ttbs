@@ -6,12 +6,13 @@ const cartController = require("../controllers/cartController");
 router.get("/user/:userId", cartController.getCartByUser);
 
 // Thêm sản phẩm vào giỏ
-router.post("/", cartController.addToCart);
+router.post("/add", cartController.addToCart);
 
 // Cập nhật số lượng sản phẩm trong giỏ
 router.put("/item/:id", cartController.updateCartItem);
 
 // Xóa sản phẩm khỏi giỏ
 router.delete("/item/:id", cartController.removeFromCart);
+
 
 module.exports = router;

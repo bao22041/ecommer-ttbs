@@ -7,6 +7,10 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Voucher
+  const [voucherCode, setVoucherCode] = useState("");
+  const [discountTotal, setDiscountTotal] = useState(null);
+
   // Giả định user_id = 1 (sau này có thể lấy từ context hoặc token)
   const userId = 1;
 
@@ -14,7 +18,7 @@ export default function CartPage() {
   const getCart = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`http://localhost:5000/api/cart/${userId}`);
+      const res = await axios.get(`http://localhost:5000/api/cart/user/${userId}`);
       setCartItems(res.data || []);
       setError("");
     } catch (err) {
@@ -33,7 +37,7 @@ export default function CartPage() {
   const handleRemove = async (cartItemId) => {
     if (!cartItemId) return;
     try {
-      await axios.delete(`http://localhost:5000/api/cart/${cartItemId}`);
+      await axios.delete(`http://localhost:5000/api/cart/item/${cartItemId}`);
       getCart(); // tải lại giỏ
     } catch (err) {
       console.error("❌ Lỗi xóa sản phẩm:", err);
@@ -45,7 +49,7 @@ export default function CartPage() {
   const handleUpdateQty = async (cartItemId, qty) => {
     if (!cartItemId || qty < 1) return;
     try {
-      await axios.put(`http://localhost:5000/api/cart/${cartItemId}`, {
+      await axios.put(`http://localhost:5000/api/cart/item/${cartItemId}`, {
         quantity: qty,
       });
       getCart();
@@ -60,6 +64,27 @@ export default function CartPage() {
     (sum, item) => sum + Number(item.price) * Number(item.quantity),
     0
   );
+
+  // Áp dụng voucher
+  const applyVoucher = async () => {
+    try {
+      const res = await axios.post("http://localhost:5000/api/vouchers/apply", {
+        code: voucherCode,
+        cartTotal: total,
+      });
+      if (res.data.newTotal) {
+        setDiscountTotal(res.data.newTotal);
+        alert(
+          `Áp dụng voucher thành công! Giảm còn ${res.data.newTotal.toLocaleString()} đ`
+        );
+      } else {
+        alert(res.data.error || "Voucher không hợp lệ");
+      }
+    } catch (err) {
+      console.error("❌ Lỗi áp voucher:", err);
+      alert("Không thể áp dụng voucher");
+    }
+  };
 
   return (
     <div className="container my-5">
@@ -135,9 +160,26 @@ export default function CartPage() {
             </tbody>
           </table>
 
+          {/* Voucher input */}
+          <div className="d-flex justify-content-end mt-3">
+            <input
+              type="text"
+              placeholder="Nhập mã voucher"
+              value={voucherCode}
+              onChange={(e) => setVoucherCode(e.target.value)}
+              className="form-control"
+              style={{ width: "200px" }}
+            />
+            <button className="btn btn-info ms-2" onClick={applyVoucher}>
+              Áp dụng
+            </button>
+          </div>
+
           <h5 className="text-end mt-3">
             Tổng cộng:{" "}
-            <span className="text-danger">{total.toLocaleString()} đ</span>
+            <span className="text-danger">
+              {(discountTotal ?? total).toLocaleString()} đ
+            </span>
           </h5>
           <button className="btn btn-success float-end">Thanh toán</button>
         </>

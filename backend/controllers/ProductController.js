@@ -2,7 +2,13 @@ const db = require("../config/db");
 
 // 📦 Lấy danh sách sản phẩm
 exports.getProducts = (req, res) => {
-  db.query("SELECT * FROM products ORDER BY created_at DESC", (err, results) => {
+  const sql = `
+    SELECT p.*, c.name AS category_name, c.slug
+    FROM products p
+    JOIN categories c ON p.category_id = c.id
+    ORDER BY p.created_at DESC
+  `;
+  db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
@@ -11,7 +17,13 @@ exports.getProducts = (req, res) => {
 // 📄 Lấy chi tiết sản phẩm theo ID
 exports.getProductById = (req, res) => {
   const { id } = req.params;
-  db.query("SELECT * FROM products WHERE id = ?", [id], (err, results) => {
+  const sql = `
+    SELECT p.*, c.name AS category_name, c.slug
+    FROM products p
+    JOIN categories c ON p.category_id = c.id
+    WHERE p.id = ?
+  `;
+  db.query(sql, [id], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0) {
       return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
@@ -22,44 +34,41 @@ exports.getProductById = (req, res) => {
 
 // ➕ Thêm sản phẩm mới
 exports.addProduct = (req, res) => {
-  const { name, description, category, size, color, specs, price, stock, image_url } = req.body;
+  const { name, description, category_id, size, color, specs, price, stock, image_url } = req.body;
 
-  if (!name || !price) {
-    return res.status(400).json({ message: "Thiếu tên hoặc giá sản phẩm" });
+  if (!name || !price || !category_id) {
+    return res.status(400).json({ message: "Thiếu tên, giá hoặc danh mục sản phẩm" });
   }
 
-  db.query(
-    `INSERT INTO products 
-     (name, description, category, size, color, specs, price, stock, image_url) 
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [name, description, category, size, color, specs, price, stock, image_url],
-    (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: "Thêm sản phẩm thành công", id: result.insertId });
-    }
-  );
+  const sql = `
+    INSERT INTO products 
+    (name, description, category_id, size, color, specs, price, stock, image_url) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  db.query(sql, [name, description, category_id, size, color, specs, price, stock, image_url], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "Thêm sản phẩm thành công", id: result.insertId });
+  });
 };
 
 // ✏️ Cập nhật sản phẩm theo ID
 exports.updateProduct = (req, res) => {
   const { id } = req.params;
-  const { name, description, category, size, color, specs, price, stock, image_url } = req.body;
+  const { name, description, category_id, size, color, specs, price, stock, image_url } = req.body;
 
-  db.query(
-    `UPDATE products 
-     SET name=?, description=?, category=?, size=?, color=?, specs=?, price=?, stock=?, image_url=? 
-     WHERE id=?`,
-    [name, description, category, size, color, specs, price, stock, image_url, id],
-    (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: "Sản phẩm không tồn tại" });
-      }
-      res.json({ message: "Cập nhật sản phẩm thành công" });
+  const sql = `
+    UPDATE products 
+    SET name=?, description=?, category_id=?, size=?, color=?, specs=?, price=?, stock=?, image_url=? 
+    WHERE id=?
+  `;
+  db.query(sql, [name, description, category_id, size, color, specs, price, stock, image_url, id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Sản phẩm không tồn tại" });
     }
-  );
+    res.json({ message: "Cập nhật sản phẩm thành công" });
+  });
 };
-
 // ❌ Xóa sản phẩm theo ID
 exports.deleteProduct = (req, res) => {
   const { id } = req.params;
@@ -73,21 +82,24 @@ exports.deleteProduct = (req, res) => {
 };
 
 // 🔍 Tìm kiếm sản phẩm theo tên
-exports.searchProducts = async (req, res) => {
+exports.searchProducts = (req, res) => {
   const { name } = req.query;
   if (!name) return res.status(400).json({ message: "Thiếu tên sản phẩm để tìm kiếm" });
 
-  try {
-    const [rows] = await db.query("SELECT * FROM products WHERE name LIKE ?", [`%${name}%`]);
-    if (rows.length > 0) {
-      res.json(rows);
+  const sql = `
+    SELECT p.*, c.name AS category_name, c.slug
+    FROM products p
+    JOIN categories c ON p.category_id = c.id
+    WHERE p.name LIKE ?
+  `;
+  db.query(sql, [`%${name}%`], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length > 0) {
+      res.json(results);
     } else {
       res.status(404).json({ message: "Không tìm thấy sản phẩm" });
     }
-  } catch (err) {
-    console.error("❌ Lỗi tìm kiếm:", err);
-    res.status(500).json({ message: "Lỗi server" });
-  }
+  });
 };
 
 // ✅ Thêm review

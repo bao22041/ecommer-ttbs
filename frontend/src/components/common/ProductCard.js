@@ -1,4 +1,3 @@
-// src/components/common/ProductCard.js
 import React from "react";
 import "./ProductCard.css";
 

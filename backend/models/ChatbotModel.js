@@ -1,24 +1,50 @@
 const db = require("../config/db");
 
-// Tìm sản phẩm theo tên gần giống
-exports.findProductByMessage = (message, callback) => {
-  db.query(
-    "SELECT id, name, category, color, size, specs, price, stock FROM products WHERE name LIKE ? LIMIT 1",
-    [`%${message}%`],
-    callback
-  );
+const ChatbotModel = {
+  findProductByMessage: (message, callback) => {
+    const sql = `
+      SELECT id, name, price, stock, brand, category_id, image_url, description 
+      FROM products 
+      WHERE name LIKE ? OR description LIKE ? 
+      LIMIT 1
+    `;
+    const like = `%${message}%`;
+    db.query(sql, [like, like], callback);
+  },
+
+  findVoucherByMessage: (message, callback) => {
+    const sql = `
+      SELECT * FROM vouchers 
+      WHERE code LIKE ? OR discount LIKE ? 
+      LIMIT 1
+    `;
+    const like = `%${message}%`;
+    db.query(sql, [like, like], callback);
+  },
+
+  saveChatLog: (data, callback) => {
+    const sql = `
+      INSERT INTO chat_bot 
+      (user_id, product_id, category_id, voucher_id, message_type, message, 
+       product_snapshot, voucher_snapshot, device, status, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    `;
+    
+    const values = [
+      data.user_id || null,
+      data.product_id || null,
+      data.category_id || null,
+      data.voucher_id || null,
+      data.message_type, 
+      data.message,
+      data.product_snapshot || null,
+      data.voucher_snapshot || null,
+      data.device || "unknown",
+      "new" 
+    ];
+
+    db.query(sql, values, callback);
+  }
 };
 
-// Gợi ý sản phẩm gần giống nếu không tìm thấy
-exports.suggestProducts = (keyword, callback) => {
-  db.query(
-    "SELECT name FROM products WHERE name LIKE ? LIMIT 3",
-    [`%${keyword}%`],
-    callback
-  );
-};
-
-// Lưu hội thoại vào bảng chat_bot
-exports.saveChatLog = (log, callback) => {
-  db.query("INSERT INTO chat_bot SET ?", log, callback);
-};
+module.exports = ChatbotModel;

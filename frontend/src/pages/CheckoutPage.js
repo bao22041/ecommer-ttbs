@@ -1,13 +1,13 @@
-// src/pages/CheckoutPage.js
 import axios from "axios";
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import "./CheckoutPage.css";
 
 export default function CheckoutPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Nhận dữ liệu từ CartPage (tổng tiền, giảm giá, voucher, giỏ hàng)
+  // Nhận dữ liệu từ CartPage
   const { total, discountTotal, voucherInfo, cartItems } = location.state || {};
 
   const [name, setName] = useState("");
@@ -20,21 +20,19 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Chuẩn bị dữ liệu gửi lên backend
     const items = cartItems?.map((i) => ({
-      product_id: i.product_id || i.id, // tuỳ theo DB
+      product_id: i.product_id || i.id,
       quantity: i.quantity,
       price: i.price,
     })) || [];
 
-    // Nếu giỏ hàng trống thì báo lỗi trước
     if (items.length === 0) {
       alert("Giỏ hàng trống hoặc không hợp lệ.");
       return;
     }
 
     const payload = {
-      user_id: 1, // 👈 đúng tên trường backend
+      user_id: 1, // Thay bằng user.id thực tế từ context
       name,
       phone,
       address,
@@ -43,78 +41,104 @@ export default function CheckoutPage() {
       items,
     };
 
-    console.log("📦 Payload gửi lên:", payload);
-
     try {
-      // Gửi dữ liệu đơn hàng lên backend
       await axios.post("http://localhost:5000/api/orders", payload);
+      await axios.delete(`http://localhost:5000/api/cart/clear/1`); // Xóa giỏ
 
-      // Xóa giỏ hàng sau khi thanh toán
-      await axios.delete(`http://localhost:5000/api/cart/clear/1`);
-
-      alert("Thanh toán thành công! Giỏ hàng đã được xóa.");
-      navigate("/"); // quay về trang chủ
+      alert("🎉 Đặt hàng thành công! Cảm ơn bạn.");
+      navigate("/");
     } catch (err) {
       console.error("❌ Lỗi thanh toán:", err.response?.data || err.message);
-      alert("Không thể hoàn tất thanh toán");
+      alert("Không thể hoàn tất thanh toán. Vui lòng thử lại.");
     }
   };
 
+  // Nếu truy cập trực tiếp mà không có dữ liệu giỏ hàng
+  if (!cartItems || cartItems.length === 0) {
+    return (
+      <div className="checkout-container">
+        <div className="checkout-card text-center">
+          <h3>🚫 Không có thông tin thanh toán</h3>
+          <button className="btn-back-cart mt-3" onClick={() => navigate("/")}>
+            Quay về trang chủ
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container my-5">
-      <h3>📦 Thanh toán</h3>
+    <div className="checkout-container">
+      <div className="checkout-card">
+        <h2 className="checkout-title">
+          Xác nhận <span>Đơn hàng</span>
+        </h2>
 
-      {/* Form nhập thông tin nhận hàng */}
-      <div className="mb-3">
-        <label className="form-label">Họ và tên</label>
-        <input
-          type="text"
-          className="form-control"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        {/* Form nhập thông tin */}
+        <div className="form-section">
+          <label className="form-label">Họ và tên người nhận</label>
+          <input
+            type="text"
+            className="checkout-input"
+            placeholder="Nhập họ tên đầy đủ"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+
+        <div className="form-section">
+          <label className="form-label">Số điện thoại</label>
+          <input
+            type="text"
+            className="checkout-input"
+            placeholder="Nhập số điện thoại liên hệ"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+
+        <div className="form-section">
+          <label className="form-label">Địa chỉ giao hàng</label>
+          <textarea
+            className="checkout-textarea"
+            rows="3"
+            placeholder="Số nhà, tên đường, phường/xã..."
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          ></textarea>
+        </div>
+
+        {/* Tóm tắt đơn hàng */}
+        <div className="order-summary">
+          <div className="summary-header">💰 Thông tin thanh toán</div>
+          
+          <div className="summary-item">
+            <span>Tổng tiền hàng:</span>
+            <strong>{voucherInfo ? voucherInfo.originalTotal?.toLocaleString() : total?.toLocaleString()} đ</strong>
+          </div>
+
+          {voucherInfo && (
+            <div className="summary-item text-success">
+              <span>Mã giảm giá ({voucherInfo.discount}%):</span>
+              <strong>- {voucherInfo.discountAmount?.toLocaleString()} đ</strong>
+            </div>
+          )}
+
+          <div className="summary-total">
+            <span>Thành tiền:</span>
+            <span>{(discountTotal ?? total)?.toLocaleString()} đ</span>
+          </div>
+        </div>
+
+        {/* Nút xác nhận */}
+        <button className="btn-confirm" onClick={handleConfirm}>
+          ✅ Xác nhận đặt hàng
+        </button>
+
+        <button className="btn-back-cart" onClick={() => navigate("/cart")}>
+          ← Quay lại giỏ hàng
+        </button>
       </div>
-
-      <div className="mb-3">
-        <label className="form-label">Số điện thoại</label>
-        <input
-          type="text"
-          className="form-control"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Địa chỉ nhận hàng</label>
-        <textarea
-          className="form-control"
-          rows="3"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        ></textarea>
-      </div>
-
-      {/* Hiển thị thông tin thanh toán */}
-      <h5 className="mt-4">💰 Thông tin thanh toán</h5>
-      <p>Tổng trước giảm: {voucherInfo?.originalTotal?.toLocaleString()} đ</p>
-      {voucherInfo && (
-        <>
-          <p>Giảm giá: {voucherInfo.discount}%</p>
-          <p>Tiết kiệm: {voucherInfo.discountAmount?.toLocaleString()} đ</p>
-        </>
-      )}
-      <h4>
-        Số tiền phải trả:{" "}
-        <span className="text-danger">
-          {(discountTotal ?? total)?.toLocaleString()} đ
-        </span>
-      </h4>
-
-      {/* Nút xác nhận thanh toán */}
-      <button className="btn btn-success mt-3" onClick={handleConfirm}>
-        ✅ Xác nhận thanh toán
-      </button>
     </div>
   );
 }

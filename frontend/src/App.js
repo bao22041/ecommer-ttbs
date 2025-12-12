@@ -20,17 +20,9 @@ import RegisterPage from "./features/auth/RegisterPage";
 // Product listing
 import ProductsPage from "./features/products/ProductsPage";
 
-// Admin pages
-import AdminProductManagement from "./features/admin/products/AdminProductManagement";
-import AdminOrderManagement from "./features/admin/orders/AdminOrderManagement";
-import AdminUserManagement from "./features/admin/users/AdminUserManagement";
-import AdminVoucherManagement from "./features/admin/vouchers/AdminVoucherManagement";
-import AdminCategoryManagement from "./features/admin/categories/AdminCategoryManagement"; // 👉 thêm quản lý danh mục
-import Dashboard from "./features/admin/Dashboard";
-import AdminLayout from "./features/admin/AdminLayout";
-
 // Common
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import WishlistPage from "./pages/WishlistPage";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -40,7 +32,6 @@ function App() {
     localStorage.setItem("token", userData.token);
     localStorage.setItem("user", JSON.stringify(userData));
   };
-
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("token");
@@ -56,7 +47,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/favorites" element={<FavoritePage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/voucher" element={<VoucherPage />} />
             <Route path="/account" element={<AccountPage />} />
@@ -69,65 +60,6 @@ function App() {
               element={<LoginPage onLoginSuccess={handleLoginSuccess} />}
             />
             <Route path="/register" element={<RegisterPage />} />
-
-            {/* ================== Admin layout ================== */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute role="admin" user={user}>
-                  <AdminLayout user={user} onLogout={handleLogout} />
-                </ProtectedRoute>
-              }
-            >
-              <Route
-                path="dashboard"
-                element={
-                  <ProtectedRoute role="admin" user={user}>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="products"
-                element={
-                  <ProtectedRoute role="admin" user={user}>
-                    <AdminProductManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="orders"
-                element={
-                  <ProtectedRoute role="admin" user={user}>
-                    <AdminOrderManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="users"
-                element={
-                  <ProtectedRoute role="admin" user={user}>
-                    <AdminUserManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="vouchers"
-                element={
-                  <ProtectedRoute role="admin" user={user}>
-                    <AdminVoucherManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="categories"
-                element={
-                  <ProtectedRoute role="admin" user={user}>
-                    <AdminCategoryManagement />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
           </Routes>
         </main>
       </Router>

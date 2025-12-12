@@ -1,4 +1,3 @@
-// src/pages/AdminDashboard.js
 import React, { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Navigate, Link } from "react-router-dom";

@@ -1,7 +1,8 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Nhớ import Link
+import "./LoginPage.css"; // Import CSS
 
 export default function LoginPage() {
   const { login } = useContext(AuthContext);
@@ -32,7 +33,6 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // gửi payload: nếu người dùng nhập email thì backend vẫn nhận được
       const payload = {
         username: form.identifier.includes("@") ? undefined : form.identifier,
         email: form.identifier.includes("@") ? form.identifier : undefined,
@@ -69,53 +69,76 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "400px", margin: "0 auto" }}>
-      <h2 className="mb-3">🔑 Đăng nhập</h2>
+    <div className="login-container">
+      <div className="login-card">
+        {/* Tiêu đề với hiệu ứng Gradient */}
+        <h2 className="login-title">
+          Chào mừng <span>TTBS</span>
+        </h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {/* Thông báo lỗi */}
+        {error && (
+          <div className="error-msg">
+            ⚠️ {error}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="identifier"
-          placeholder="Tên đăng nhập hoặc Email"
-          value={form.identifier}
-          onChange={handleChange}
-          required
-          className="form-control mb-2"
-          ref={identifierRef}
-        />
+        <form onSubmit={handleSubmit}>
+          {/* Ô nhập User/Email */}
+          <div className="form-group">
+            <input
+              type="text"
+              name="identifier"
+              placeholder="Tên đăng nhập hoặc Email"
+              value={form.identifier}
+              onChange={handleChange}
+              required
+              className="custom-input"
+              ref={identifierRef}
+            />
+          </div>
 
-        <div className="input-group mb-2">
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            placeholder="Mật khẩu"
-            value={form.password}
-            onChange={handleChange}
-            required
-            className="form-control"
-          />
-          <button
-            type="button"
-            className="btn btn-outline-secondary"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? "🙈 Ẩn" : "👁️ Hiện"}
+          {/* Ô nhập Password + Nút hiện/ẩn */}
+          <div className="form-group password-group">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Mật khẩu"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="custom-input"
+            />
+            <button
+              type="button"
+              className="btn-show-pass"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "Ẩn" : "Hiện"}
+            </button>
+          </div>
+
+          {/* Nút Submit */}
+          <button type="submit" className="btn-login" disabled={loading}>
+            {loading ? (
+              <span>
+                <span className="spinner-border spinner-border-sm me-2"></span>
+                Đang đăng nhập...
+              </span>
+            ) : (
+              "Đăng nhập ngay"
+            )}
           </button>
-        </div>
+        </form>
 
-        <button type="submit" className="btn btn-primary w-100" disabled={loading}>
-          {loading ? (
-            <span>
-              <span className="spinner-border spinner-border-sm me-2"></span>
-              Đang đăng nhập...
-            </span>
-          ) : (
-            "Đăng nhập"
-          )}
-        </button>
-      </form>
+        {/* Links phụ */}
+        <div className="auth-links">
+          <p>Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link></p>
+          <Link to="/" style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+            ← Quay lại trang chủ
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,75 +1,101 @@
-// src/components/common/Header.js
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
-import "./Header.css";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { WishlistContext } from "../../context/WishlistContext";
+import "./Header.css"; // Import file CSS bạn đã cung cấp
 
 export default function Header() {
   const { user, logout } = useContext(AuthContext);
+  const { wishlist } = useContext(WishlistContext);
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  // Danh mục sản phẩm (Slug phải khớp với router/backend)
+  const categories = [
+    { slug: "dientu", name: "Điện tử" },
+    { slug: "dienlanh", name: "Điện lạnh" },
+    { slug: "giadung", name: "Gia dụng & Văn phòng" },
+    { slug: "dienthoai", name: "Điện thoại & Smart device" },
+    { slug: "kythuatso", name: "Kỹ thuật số & Giải trí" },
+    { slug: "suckhoe", name: "Sức khỏe & Cá nhân" },
+    { slug: "phukien", name: "Phụ kiện điện máy" },
+  ];
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/search?name=${encodeURIComponent(searchTerm)}`);
+    }
+  };
 
   return (
     <header className="header">
-      <div className="logo">TTBS</div>
+      {/* 1. Logo */}
+      <div className="logo" onClick={() => navigate("/")}>
+        TTBS
+      </div>
 
+      {/* 2. Search Bar (Khớp với CSS .search-bar input & button) */}
+      <form className="search-bar" onSubmit={handleSearch}>
+        <input
+          type="text"
+          placeholder="Bạn cần tìm gì hôm nay?"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <button type="submit">🔍</button>
+      </form>
+
+      {/* 3. Navigation */}
       <nav className="nav">
         <ul>
           <li><Link to="/">Trang chủ</Link></li>
-          <li><Link to="/about">Giới thiệu</Link></li>
+          
+          {/* Dropdown Danh mục */}
+          <li className="dropdown">
+            {/* Thẻ span này quan trọng để CSS tạo mũi tên (::after) */}
+            <span>Danh mục</span>
+            <div className="dropdown-menu">
+              {categories.map((cat) => (
+                <Link key={cat.slug} to={`/category/${cat.slug}`}>
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+          </li>
+
           <li><Link to="/news">Tin tức</Link></li>
-          <li><Link to="/contact">Liên hệ</Link></li>
-          <li><Link to="/cart">Giỏ hàng</Link></li>
-          <li><Link to="/favorites">Yêu thích</Link></li>
-
-          {/* Sản phẩm */}
-          <li className="dropdown">
-            <span>Danh mục</span>
-            <ul className="dropdown-menu">
-              <li><Link to="/category/dientu">Điện tử</Link></li>
-              <li><Link to="/category/dienlanh">Điện lạnh</Link></li>
-              <li><Link to="/category/giadung">Gia dụng, máy tính & thiết bị văn phòng</Link></li>
-              <li><Link to="/category/dienthoai">Điện thoại & thiết bị thông minh</Link></li>
-              <li><Link to="/category/kythuatso">Kỹ thuật số & giải trí</Link></li>
-              <li><Link to="/category/suckhoe">Sức khỏe & cá nhân</Link></li>
-              <li><Link to="/category/phukien">Phụ kiện điện máy</Link></li>
-            </ul>
+          
+          <li>
+            <Link to="/wishlist">
+              Yêu thích ❤️ {wishlist.length > 0 && `(${wishlist.length})`}
+            </Link>
           </li>
+          
+          <li><Link to="/cart">Giỏ hàng 🛒</Link></li>
 
-          {/* Danh mục */}
+          {/* Dropdown Tài khoản */}
           <li className="dropdown">
-            <span>Danh mục</span>
-            <ul className="dropdown-menu">
-              <li><Link to="/category/dientu">Điện tử</Link></li>
-              <li><Link to="/category/dienlanh">Điện lạnh</Link></li>
-              <li><Link to="/category/giadung">Gia dụng, máy tính & thiết bị văn phòng</Link></li>
-              <li><Link to="/category/dienthoai">Điện thoại & thiết bị thông minh</Link></li>
-              <li><Link to="/category/kythuatso">Kỹ thuật số & giải trí</Link></li>
-              <li><Link to="/category/suckhoe">Sức khỏe & cá nhân</Link></li>
-              <li><Link to="/category/phukien">Phụ kiện điện máy</Link></li>
-            </ul>
-          </li>
-
-          {/* Tài khoản */}
-          <li className="dropdown">
-            {user ? (
-              <>
-                <span>👤 {user.username}</span>
-                <ul className="dropdown-menu">
-                  <li>
-                    <button className="dropdown-item" onClick={logout}>
-                      Đăng xuất
-                    </button>
-                  </li>
-                </ul>
-              </>
-            ) : (
-              <>
-                <span>Tài khoản</span>
-                <ul className="dropdown-menu">
-                  <li><Link to="/login">Đăng nhập</Link></li>
-                  <li><Link to="/register">Đăng ký</Link></li>
-                </ul>
-              </>
-            )}
+            <span>
+              {user ? `👤 ${user.username}` : "👤 Tài khoản"}
+            </span>
+            <div className="dropdown-menu">
+              {user ? (
+                <>
+                  <Link to="/profile">Thông tin cá nhân</Link>
+                  <Link to="/orders">Đơn mua</Link>
+                  {user.role === 'admin' && <Link to="/admin">Trang quản trị</Link>}
+                  <button className="dropdown-item" onClick={logout}>
+                    Đăng xuất
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login">Đăng nhập</Link>
+                  <Link to="/register">Đăng ký</Link>
+                </>
+              )}
+            </div>
           </li>
         </ul>
       </nav>

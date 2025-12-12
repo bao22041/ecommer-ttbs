@@ -2,16 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-// Load biến môi trường
 dotenv.config();
 
-// Kết nối DB
 require("./config/db");
 
-// Import controllers để seed admin
 const { seedAdmin } = require("./controllers/authController");
 
-// Import routes
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/productRoutes");
 const productImageRoutes = require("./routes/productImages");
@@ -26,14 +22,12 @@ const adminReportRoutes = require("./routes/adminReports");
 const userRoutes = require("./routes/users");
 const chatbotRoutes = require("./routes/chatbot");
 
-// Middleware
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ================== ROUTES ==================
 app.use("/api/auth", authRoutes);
 app.use("/api/products/images", productImageRoutes);
 app.use("/api/products/search", productSearchRoutes);
@@ -50,7 +44,6 @@ app.use("/api/chatbot", chatbotRoutes);
 
 app.use(errorHandler);
 
-// Xử lý route không tồn tại
 app.use((req, res) => {
   res.status(404).json({ message: "API không tồn tại" });
 });

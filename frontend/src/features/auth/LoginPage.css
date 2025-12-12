@@ -1,0 +1,169 @@
+:root {
+  --tech-bg: #f8fafc;
+  --tech-primary: #0f172a;
+  --tech-accent: #2563eb;
+  --tech-gradient: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  --input-border: #cbd5e1;
+  --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--tech-bg);
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 20px 20px;
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--tech-primary);
+  letter-spacing: -0.5px;
+}
+
+.login-title span {
+  background: var(--tech-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  width: 100%; /* Đảm bảo container rộng 100% */
+}
+
+/* --- CHỈNH SỬA QUAN TRỌNG TẠI ĐÂY --- */
+.custom-input {
+  width: 100%;
+  height: 48px; /* Cố định chiều cao để 2 ô bằng nhau chằn chặn */
+  padding: 0 15px; /* Padding ngang, bỏ padding dọc để dùng height căn giữa */
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+  background-color: #f8fafc;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  outline: none;
+  box-sizing: border-box; /* Quan trọng: để padding không làm to ô input */
+}
+
+.custom-input:focus {
+  background-color: white;
+  border-color: var(--tech-accent);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+/* Sửa lại password-group: Bỏ flex để input hành xử giống ô trên */
+.password-group {
+  position: relative;
+  /* display: flex;  <-- XÓA DÒNG NÀY */
+  /* align-items: center; <-- XÓA DÒNG NÀY */
+}
+
+/* Ô password cần padding bên phải nhiều hơn để tránh nút Show */
+.password-group .custom-input {
+  padding-right: 80px;
+}
+
+.btn-show-pass {
+  position: absolute;
+  top: 50%; /* Căn giữa theo chiều dọc */
+  right: 15px; /* Cách lề phải một chút */
+  transform: translateY(-50%); /* Dịch chuyển để chính giữa tâm */
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  color: #64748b;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.2s;
+  padding: 0;
+  height: auto;
+  z-index: 10;
+}
+
+.btn-show-pass:hover {
+  color: var(--tech-accent);
+}
+
+/* --- CÁC PHẦN KHÁC GIỮ NGUYÊN --- */
+
+/* Nút Đăng nhập */
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  border-radius: 50px;
+  border: none;
+  background: var(--tech-gradient);
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  margin-top: 10px;
+}
+
+.btn-login:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-login:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.error-msg {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 20px;
+  border: 1px solid #fee2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-links {
+  margin-top: 25px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.auth-links a {
+  color: var(--tech-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}

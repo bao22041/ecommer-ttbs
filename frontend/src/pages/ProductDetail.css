@@ -1,0 +1,235 @@
+/* =========================================
+   PRODUCT DETAIL STYLES (TECH THEME)
+   ========================================= */
+
+:root {
+  --tech-bg: #f8fafc;
+  --tech-primary: #0f172a;
+  --tech-accent: #2563eb;
+  --tech-gradient: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  --tech-text-dark: #334155;
+  --tech-text-light: #64748b;
+  --price-color: #dc2626;
+  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --input-border: #cbd5e1;
+}
+
+/* --- CONTAINER --- */
+.product-detail-page {
+  background-color: var(--tech-bg);
+  min-height: 90vh;
+  padding-bottom: 80px;
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 20px 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- CARD SẢN PHẨM CHÍNH --- */
+.product-main-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  padding: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  margin-top: 30px;
+}
+
+/* Cột Ảnh */
+.product-img-wrapper {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  max-height: 500px;
+}
+
+.product-detail-img {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  transition: transform 0.3s;
+}
+
+.product-detail-img:hover {
+  transform: scale(1.05);
+}
+
+/* Cột Thông tin */
+.product-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--tech-primary);
+  margin-bottom: 15px;
+  line-height: 1.2;
+}
+
+.product-price-tag {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--price-color);
+  margin-bottom: 25px;
+  display: inline-block;
+  padding: 5px 0;
+  border-bottom: 3px solid var(--tech-accent);
+}
+
+/* Bảng thông số nhỏ */
+.specs-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.specs-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  font-size: 0.95rem;
+  color: var(--tech-text-dark);
+}
+
+.specs-list li strong {
+  width: 140px;
+  color: var(--tech-primary);
+  font-weight: 600;
+}
+
+.specs-list li:last-child {
+  border-bottom: none;
+}
+
+/* Các nút hành động */
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-add-cart {
+  flex: 2;
+  padding: 15px;
+  background: var(--tech-gradient);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.btn-add-cart:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+}
+
+.btn-toggle-wish {
+  flex: 1;
+  padding: 15px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  color: var(--tech-text-light);
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-toggle-wish:hover {
+  border-color: #ec4899;
+  color: #ec4899;
+}
+
+.btn-toggle-wish.active {
+  background: #fdf2f8;
+  border-color: #ec4899;
+  color: #ec4899;
+}
+
+/* --- PHẦN ĐÁNH GIÁ (REVIEWS) --- */
+.reviews-container {
+  margin-top: 50px;
+}
+
+.section-heading {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--tech-primary);
+  margin-bottom: 20px;
+  padding-left: 15px;
+  border-left: 5px solid var(--tech-accent);
+}
+
+.review-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  padding: 25px;
+  margin-bottom: 20px;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.review-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 2px solid #e2e8f0;
+}
+
+.review-author {
+  font-weight: 700;
+  color: var(--tech-primary);
+  font-size: 1rem;
+}
+
+.review-rating {
+  font-size: 0.9rem;
+  color: #fbbf24; /* Vàng */
+  margin-left: auto;
+}
+
+.review-content {
+  color: var(--tech-text-dark);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  background-color: #f8fafc;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .product-main-card {
+    padding: 20px;
+  }
+  .product-title {
+    font-size: 1.5rem;
+    margin-top: 20px;
+  }
+  .action-buttons {
+    flex-direction: column;
+  }
+}

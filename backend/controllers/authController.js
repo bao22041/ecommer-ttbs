@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 // Đăng ký
 exports.register = (req, res, next) => {
-  const { username, password, email, full_name } = req.body;
+  const { username, password, email, full_name, phone, address } = req.body;
 
   if (!username || !password || !email) {
     return res.status(400).json({ message: "Thiếu dữ liệu đăng ký" });
@@ -22,8 +22,9 @@ exports.register = (req, res, next) => {
       }
 
       db.query(
-        "INSERT INTO users (username, password, email, full_name) VALUES (?, ?, ?, ?)",
-        [username, hashedPassword, email, full_name],
+        `INSERT INTO users (username, password, email, full_name, phone, address)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [username, hashedPassword, email, full_name, phone, address],
         (err, result) => {
           if (err) return next(err);
           res.status(201).json({ message: "Đăng ký thành công", id: result.insertId });

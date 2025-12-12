@@ -11,7 +11,7 @@ import CartPage from "./pages/CartPage";
 import VoucherPage from "./pages/VoucherPage";
 import AccountPage from "./pages/AccountPage";
 import CheckoutPage from "./pages/CheckoutPage";
-import CategoryPage from "./pages/CategoryPage";   // 👉 thêm import
+import CategoryPage from "./pages/CategoryPage";
 
 // Auth
 import LoginPage from "./features/auth/LoginPage";
@@ -25,6 +25,7 @@ import AdminProductManagement from "./features/admin/products/AdminProductManage
 import AdminOrderManagement from "./features/admin/orders/AdminOrderManagement";
 import AdminUserManagement from "./features/admin/users/AdminUserManagement";
 import AdminVoucherManagement from "./features/admin/vouchers/AdminVoucherManagement";
+import AdminCategoryManagement from "./features/admin/categories/AdminCategoryManagement"; // 👉 thêm quản lý danh mục
 import Dashboard from "./features/admin/Dashboard";
 import AdminLayout from "./features/admin/AdminLayout";
 
@@ -37,11 +38,13 @@ function App() {
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     localStorage.setItem("token", userData.token);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   return (
@@ -49,7 +52,7 @@ function App() {
       <Router>
         <main style={{ minHeight: "80vh", padding: "20px" }}>
           <Routes>
-            {/* Trang chính */}
+            {/* ================== Public routes ================== */}
             <Route path="/" element={<HomePage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
@@ -58,65 +61,73 @@ function App() {
             <Route path="/voucher" element={<VoucherPage />} />
             <Route path="/account" element={<AccountPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/category/:slug" element={<CategoryPage />} /> 
-            {/* 👉 thêm route danh mục */}
+            <Route path="/category/:slug" element={<CategoryPage />} />
 
-            {/* Auth */}
+            {/* ================== Auth routes ================== */}
             <Route
               path="/login"
               element={<LoginPage onLoginSuccess={handleLoginSuccess} />}
             />
             <Route path="/register" element={<RegisterPage />} />
 
-            {/* Admin */}
+            {/* ================== Admin layout ================== */}
             <Route
               path="/admin"
               element={
-                <ProtectedRoute role="admin">
-                  <AdminLayout />
+                <ProtectedRoute role="admin" user={user}>
+                  <AdminLayout user={user} onLogout={handleLogout} />
                 </ProtectedRoute>
               }
-            />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute role="admin">
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/products"
-              element={
-                <ProtectedRoute role="admin">
-                  <AdminProductManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/orders"
-              element={
-                <ProtectedRoute role="admin">
-                  <AdminOrderManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/users"
-              element={
-                <ProtectedRoute role="admin">
-                  <AdminUserManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/vouchers"
-              element={
-                <ProtectedRoute role="admin">
-                  <AdminVoucherManagement />
-                </ProtectedRoute>
-              }
-            />
+            >
+              <Route
+                path="dashboard"
+                element={
+                  <ProtectedRoute role="admin" user={user}>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="products"
+                element={
+                  <ProtectedRoute role="admin" user={user}>
+                    <AdminProductManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="orders"
+                element={
+                  <ProtectedRoute role="admin" user={user}>
+                    <AdminOrderManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="users"
+                element={
+                  <ProtectedRoute role="admin" user={user}>
+                    <AdminUserManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="vouchers"
+                element={
+                  <ProtectedRoute role="admin" user={user}>
+                    <AdminVoucherManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="categories"
+                element={
+                  <ProtectedRoute role="admin" user={user}>
+                    <AdminCategoryManagement />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
           </Routes>
         </main>
       </Router>

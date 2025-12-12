@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -7,9 +7,20 @@ export default function LoginPage() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ username: "", password: "" });
+  // 👉 Cho phép nhập username hoặc email
+  const [form, setForm] = useState({ identifier: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const identifierRef = useRef(null);
+
+  useEffect(() => {
+    // focus vào ô username/email khi load trang
+    if (identifierRef.current) {
+      identifierRef.current.focus();
+    }
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,8 +30,18 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", form);
+      // gửi payload: nếu người dùng nhập email thì backend vẫn nhận được
+      const payload = {
+        username: form.identifier.includes("@") ? undefined : form.identifier,
+        email: form.identifier.includes("@") ? form.identifier : undefined,
+        password: form.password,
+      };
+
+      const res = await axios.post("http://localhost:5000/api/auth/login", payload, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       // 👉 Lưu token và user vào localStorage
       localStorage.setItem("token", res.data.token);
@@ -37,7 +58,11 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.response?.data?.message || "Sai tài khoản hoặc mật khẩu");
+      if (err.response) {
+        setError(err.response.data?.message || "Sai tài khoản hoặc mật khẩu");
+      } else {
+        setError("Không thể kết nối đến server. Vui lòng thử lại sau.");
+      }
     } finally {
       setLoading(false);
     }
@@ -45,29 +70,50 @@ export default function LoginPage() {
 
   return (
     <div style={{ padding: "20px", maxWidth: "400px", margin: "0 auto" }}>
-      <h2>Đăng nhập</h2>
+      <h2 className="mb-3">🔑 Đăng nhập</h2>
+
       {error && <p style={{ color: "red" }}>{error}</p>}
+
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          name="username"
-          placeholder="Tên đăng nhập"
-          value={form.username}
+          name="identifier"
+          placeholder="Tên đăng nhập hoặc Email"
+          value={form.identifier}
           onChange={handleChange}
           required
           className="form-control mb-2"
+          ref={identifierRef}
         />
-        <input
-          type="password"
-          name="password"
-          placeholder="Mật khẩu"
-          value={form.password}
-          onChange={handleChange}
-          required
-          className="form-control mb-2"
-        />
+
+        <div className="input-group mb-2">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Mật khẩu"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? "🙈 Ẩn" : "👁️ Hiện"}
+          </button>
+        </div>
+
         <button type="submit" className="btn btn-primary w-100" disabled={loading}>
-          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+          {loading ? (
+            <span>
+              <span className="spinner-border spinner-border-sm me-2"></span>
+              Đang đăng nhập...
+            </span>
+          ) : (
+            "Đăng nhập"
+          )}
         </button>
       </form>
     </div>

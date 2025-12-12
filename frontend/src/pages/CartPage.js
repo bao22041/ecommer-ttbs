@@ -12,7 +12,13 @@ export default function CartPage() {
   // Voucher
   const [voucherCode, setVoucherCode] = useState("");
   const [discountTotal, setDiscountTotal] = useState(null);
+<<<<<<< HEAD
   const [voucherInfo, setVoucherInfo] = useState(null);
+=======
+
+  // Giả định user_id = 1 (sau này có thể lấy từ context hoặc token)
+  const userId = 1;
+>>>>>>> 5077694c6e04c1c8e8a7caaf266df7b32a995452
 
   const userId = 1;
   const navigate = useNavigate();
@@ -43,7 +49,11 @@ export default function CartPage() {
     if (!cartItemId) return;
     try {
       await axios.delete(`http://localhost:5000/api/cart/item/${cartItemId}`);
+<<<<<<< HEAD
       getCart();
+=======
+      getCart(); // tải lại giỏ
+>>>>>>> 5077694c6e04c1c8e8a7caaf266df7b32a995452
     } catch (err) {
       console.error("❌ Lỗi xóa sản phẩm:", err);
       alert("Không thể xóa sản phẩm khỏi giỏ hàng.");
@@ -68,12 +78,17 @@ export default function CartPage() {
     0
   );
 
+<<<<<<< HEAD
+=======
+  // Áp dụng voucher
+>>>>>>> 5077694c6e04c1c8e8a7caaf266df7b32a995452
   const applyVoucher = async () => {
     try {
       const res = await axios.post("http://localhost:5000/api/vouchers/apply", {
         code: voucherCode,
         cartTotal: total,
       });
+<<<<<<< HEAD
 
       if (res.data.newTotal) {
         setDiscountTotal(res.data.newTotal);
@@ -82,6 +97,10 @@ export default function CartPage() {
           discountAmount: res.data.discountAmount,
           originalTotal: res.data.originalTotal,
         });
+=======
+      if (res.data.newTotal) {
+        setDiscountTotal(res.data.newTotal);
+>>>>>>> 5077694c6e04c1c8e8a7caaf266df7b32a995452
         alert(
           `Áp dụng voucher thành công! Giảm còn ${res.data.newTotal.toLocaleString()} đ`
         );
@@ -197,7 +216,10 @@ export default function CartPage() {
             </button>
           </div>
 
+<<<<<<< HEAD
           {/* Hiển thị tổng cộng và giảm giá */}
+=======
+>>>>>>> 5077694c6e04c1c8e8a7caaf266df7b32a995452
           <h5 className="text-end mt-3">
             Tổng cộng:{" "}
             <span className="text-danger">

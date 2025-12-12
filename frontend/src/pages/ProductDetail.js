@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
+import { WishlistContext } from "../context/WishlistContext";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -11,30 +12,69 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-useEffect(() => {
-  // Lấy thông tin sản phẩm
-  axios
-    .get(`http://localhost:5000/api/products/${id}`)
-    .then((res) => {
-      setProduct(res.data);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Lỗi khi tải sản phẩm:", err);
-      setError("Không tìm thấy sản phẩm.");
-      setLoading(false);
-    });
+  const { wishlist, addToWishlist, removeFromWishlist } = useContext(WishlistContext);
+  const userId = 1; // giả định userId, sau này lấy từ AuthContext
 
-  // Lấy review của sản phẩm
-  axios
-    .get(`http://localhost:5000/api/reviews/${id}`)
-    .then((res) => {
-      setReviews(res.data);
-    })
-    .catch((err) => {
-      console.error("Lỗi khi tải đánh giá:", err);
-    });
-}, [id]);
+  useEffect(() => {
+    // Lấy thông tin sản phẩm
+    axios
+      .get(`http://localhost:5000/api/products/${id}`)
+      .then((res) => {
+        setProduct(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Lỗi khi tải sản phẩm:", err);
+        setError("Không tìm thấy sản phẩm.");
+        setLoading(false);
+      });
+
+    // Lấy review của sản phẩm
+    axios
+      .get(`http://localhost:5000/api/reviews/${id}`)
+      .then((res) => {
+        setReviews(res.data);
+      })
+      .catch((err) => {
+        console.error("Lỗi khi tải đánh giá:", err);
+      });
+  }, [id]);
+
+  // 👉 Hàm thêm sản phẩm vào giỏ
+  const addToCart = async () => {
+    try {
+      await axios.post("http://localhost:5000/api/cart/add", {
+        user_id: userId,
+        product_id: product.id,
+        quantity: 1,
+      });
+      alert("✅ Đã thêm sản phẩm vào giỏ hàng!");
+    } catch (err) {
+      console.error("❌ Lỗi thêm vào giỏ:", err);
+      alert("Không thể thêm sản phẩm vào giỏ hàng.");
+    }
+  };
+
+  // 👉 Kiểm tra sản phẩm đã có trong wishlist chưa
+  const isFavorite = wishlist.some(
+    (item) => item.id === product?.id || item.product_id === product?.id
+  );
+
+  // 👉 Toggle wishlist
+  const toggleWishlist = () => {
+    if (isFavorite) {
+      removeFromWishlist(product.id);
+      alert("❌ Đã bỏ sản phẩm khỏi danh sách yêu thích!");
+    } else {
+      addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image_url: product.image_url,
+      });
+      alert("❤️ Đã thêm sản phẩm vào danh sách yêu thích!");
+    }
+  };
 
   if (loading) {
     return (
@@ -77,7 +117,19 @@ useEffect(() => {
             <p><strong>Tồn kho:</strong> {product.stock}</p>
             <p><strong>Mô tả:</strong> {product.description}</p>
             <p><strong>Thông số kỹ thuật:</strong> {product.specs}</p>
-            <button className="btn btn-primary mt-3">🛒 Thêm vào giỏ</button>
+
+            {/* Nút thêm giỏ và yêu thích */}
+            <div className="mt-3 d-flex gap-2">
+              <button className="btn btn-primary" onClick={addToCart}>
+                🛒 Thêm vào giỏ
+              </button>
+              <button
+                className={`btn ${isFavorite ? "btn-danger" : "btn-outline-danger"}`}
+                onClick={toggleWishlist}
+              >
+                {isFavorite ? "❌ Bỏ yêu thích" : "❤️ Yêu thích"}
+              </button>
+            </div>
           </div>
         </div>
 

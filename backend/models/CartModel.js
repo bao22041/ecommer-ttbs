@@ -83,3 +83,13 @@ exports.removeFromCart = (cartItemId, callback) => {
   const sql = "DELETE FROM cart_items WHERE id = ?";
   db.query(sql, [cartItemId], callback);
 };
+
+// Xóa toàn bộ sản phẩm trong giỏ theo user_id
+exports.clearCart = (userId, callback) => {
+  const sql = `
+    DELETE ci FROM cart_items ci
+    JOIN cart c ON ci.cart_id = c.id
+    WHERE c.user_id = ?
+  `;
+  db.query(sql, [userId], callback);
+};

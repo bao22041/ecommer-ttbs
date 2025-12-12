@@ -1,3 +1,4 @@
+const db = require("../config/db");
 const CartModel = require("../models/CartModel");
 
 // 📦 Lấy giỏ hàng theo user_id
@@ -55,3 +56,16 @@ exports.removeFromCart = (req, res) => {
     res.json({ message: "Đã xóa khỏi giỏ hàng", cart_item_id: cartItemId });
   });
 };
+exports.clearCart = (req, res) => {
+  const userId = req.params.userId;
+  if (!userId) return res.status(400).json({ message: "Thiếu user_id" });
+
+  CartModel.clearCart(userId, (err, result) => {
+    if (err) {
+      console.error("❌ Lỗi xóa giỏ hàng:", err);
+      return res.status(500).json({ error: "Lỗi server khi xóa giỏ hàng" });
+    }
+    res.json({ message: "Đã xóa toàn bộ giỏ hàng", affectedRows: result.affectedRows });
+  });
+};
+

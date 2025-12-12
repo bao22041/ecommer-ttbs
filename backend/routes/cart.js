@@ -14,5 +14,8 @@ router.put("/item/:id", cartController.updateCartItem);
 // Xóa sản phẩm khỏi giỏ
 router.delete("/item/:id", cartController.removeFromCart);
 
+// Xóa toàn bộ giỏ hàng sau khi thanh toán
+router.delete("/clear/:userId", cartController.clearCart);
+
 
 module.exports = router;

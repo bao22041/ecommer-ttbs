@@ -1,6 +1,8 @@
 // src/pages/CartPage.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { WishlistContext } from "../context/WishlistContext";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([]);
@@ -10,11 +12,15 @@ export default function CartPage() {
   // Voucher
   const [voucherCode, setVoucherCode] = useState("");
   const [discountTotal, setDiscountTotal] = useState(null);
+  const [voucherInfo, setVoucherInfo] = useState(null);
 
-  // Giả định user_id = 1 (sau này có thể lấy từ context hoặc token)
   const userId = 1;
+  const navigate = useNavigate();
 
-  // Hàm tải giỏ hàng theo userId
+  // Wishlist context
+  const { addToWishlist } = useContext(WishlistContext);
+
+  // Hàm tải giỏ hàng
   const getCart = async () => {
     try {
       setLoading(true);
@@ -33,19 +39,17 @@ export default function CartPage() {
     getCart();
   }, []);
 
-  // Xóa sản phẩm khỏi giỏ
   const handleRemove = async (cartItemId) => {
     if (!cartItemId) return;
     try {
       await axios.delete(`http://localhost:5000/api/cart/item/${cartItemId}`);
-      getCart(); // tải lại giỏ
+      getCart();
     } catch (err) {
       console.error("❌ Lỗi xóa sản phẩm:", err);
       alert("Không thể xóa sản phẩm khỏi giỏ hàng.");
     }
   };
 
-  // Cập nhật số lượng
   const handleUpdateQty = async (cartItemId, qty) => {
     if (!cartItemId || qty < 1) return;
     try {
@@ -59,21 +63,25 @@ export default function CartPage() {
     }
   };
 
-  // Tính tổng tiền
   const total = cartItems.reduce(
     (sum, item) => sum + Number(item.price) * Number(item.quantity),
     0
   );
 
-  // Áp dụng voucher
   const applyVoucher = async () => {
     try {
       const res = await axios.post("http://localhost:5000/api/vouchers/apply", {
         code: voucherCode,
         cartTotal: total,
       });
+
       if (res.data.newTotal) {
         setDiscountTotal(res.data.newTotal);
+        setVoucherInfo({
+          discount: res.data.discount,
+          discountAmount: res.data.discountAmount,
+          originalTotal: res.data.originalTotal,
+        });
         alert(
           `Áp dụng voucher thành công! Giảm còn ${res.data.newTotal.toLocaleString()} đ`
         );
@@ -154,6 +162,20 @@ export default function CartPage() {
                     >
                       ❌ Xóa
                     </button>
+                    <button
+                      className="btn btn-sm btn-outline-danger ms-2"
+                      onClick={() =>
+                        addToWishlist({
+                          id: item.product_id,
+                          product_id: item.product_id,
+                          name: item.name,
+                          price: item.price,
+                          image_url: item.image_url,
+                        })
+                      }
+                    >
+                      ❤️ Yêu thích
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -175,13 +197,42 @@ export default function CartPage() {
             </button>
           </div>
 
+          {/* Hiển thị tổng cộng và giảm giá */}
           <h5 className="text-end mt-3">
             Tổng cộng:{" "}
             <span className="text-danger">
               {(discountTotal ?? total).toLocaleString()} đ
             </span>
           </h5>
-          <button className="btn btn-success float-end">Thanh toán</button>
+
+          {voucherInfo && (
+            <div className="text-end mt-2">
+              <h6 className="text-success">
+                Bạn được giảm {voucherInfo.discount}% – tiết kiệm{" "}
+                {voucherInfo.discountAmount.toLocaleString()} đ
+              </h6>
+              <h6 className="text-muted">
+                Tổng trước giảm: {voucherInfo.originalTotal.toLocaleString()} đ
+              </h6>
+            </div>
+          )}
+
+          {/* Nút Thanh toán chuyển sang trang Checkout */}
+          <button
+            className="btn btn-success float-end"
+            onClick={() =>
+              navigate("/checkout", {
+                state: {
+                  total,
+                  discountTotal,
+                  voucherInfo,
+                  cartItems,
+                },
+              })
+            }
+          >
+            Thanh toán
+          </button>
         </>
       )}
     </div>

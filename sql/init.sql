@@ -10,21 +10,33 @@ CREATE TABLE IF NOT EXISTS products (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   description TEXT,
-  category_id INT,
+  category_id INT NOT NULL,
   size VARCHAR(50),
   color VARCHAR(50),
   specs TEXT,
-  price DECIMAL(10,2) NOT NULL,
-  stock INT DEFAULT 0,
+  price DECIMAL(10,2) NOT NULL CHECK (price >= 0),
+  stock INT DEFAULT 0 CHECK (stock >= 0),
   image_url VARCHAR(255),
+  brand VARCHAR(100),              -- ✅ thêm thương hiệu
+  rating DECIMAL(2,1) DEFAULT 0.0, -- ✅ thêm điểm đánh giá trung bình
+  sold INT DEFAULT 0,              -- ✅ thêm số lượng đã bán
+  is_active BOOLEAN DEFAULT TRUE,  -- ✅ trạng thái hiển thị
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (category_id) REFERENCES categories(id)
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_products_category
+    FOREIGN KEY (category_id)
+    REFERENCES categories(id)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT
 );
+
 
 -- Bảng categories
 CREATE TABLE IF NOT EXISTS categories (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
+  name VARCHAR(100) NOT NULL UNIQUE,         -- tên danh mục duy nhất
+  slug VARCHAR(100) GENERATED ALWAYS AS (LOWER(REPLACE(name, ' ', ''))) STORED, -- slug URL
   description TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -89,7 +101,10 @@ CREATE TABLE IF NOT EXISTS orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   voucher_id INT,
-  total DECIMAL(10,2) NOT NULL,
+  total DECIMAL(15,2) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  address VARCHAR(255) NOT NULL,
   status ENUM('pending','paid','shipped','completed','cancelled') DEFAULT 'pending',
   order_date DATE DEFAULT (CURRENT_DATE),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -98,13 +113,14 @@ CREATE TABLE IF NOT EXISTS orders (
   FOREIGN KEY (voucher_id) REFERENCES vouchers(id)
 );
 
+
 -- Bảng order_items
 CREATE TABLE IF NOT EXISTS order_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT NOT NULL,
   product_id INT NOT NULL,
   quantity INT NOT NULL,
-  price DECIMAL(10,2) NOT NULL,
+  price DECIMAL(15,2) NOT NULL,
   FOREIGN KEY (order_id) REFERENCES orders(id),
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
@@ -166,3 +182,7 @@ CREATE TABLE IF NOT EXISTS chat_bot (
   FOREIGN KEY (product_id) REFERENCES products(id),
   FOREIGN KEY (compared_product_id) REFERENCES products(id)
 );
+
+CREATE INDEX idx_products_name ON products(name);
+CREATE INDEX idx_products_category_id ON products(category_id);
+CREATE INDEX idx_categories_slug ON categories(slug);

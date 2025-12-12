@@ -18,19 +18,19 @@ export default function Header() {
           <li><Link to="/news">Tin tức</Link></li>
           <li><Link to="/contact">Liên hệ</Link></li>
           <li><Link to="/cart">Giỏ hàng</Link></li>
-          <li><Link to="/wishlist">Yêu thích</Link></li>
+          <li><Link to="/favorites">Yêu thích</Link></li>
 
           {/* Sản phẩm */}
           <li className="dropdown">
-            <span>Sản phẩm</span>
+            <span>Danh mục</span>
             <ul className="dropdown-menu">
-              <li>Điện tử</li>
-              <li>Điện lạnh</li>
-              <li>Gia dụng, máy tính & thiết bị văn phòng</li>
-              <li>Điện thoại & thiết bị thông minh</li>
-              <li>Kỹ thuật số & giải trí</li>
-              <li>Sức khỏe & cá nhân</li>
-              <li>Phụ kiện điện máy</li>
+              <li><Link to="/category/dientu">Điện tử</Link></li>
+              <li><Link to="/category/dienlanh">Điện lạnh</Link></li>
+              <li><Link to="/category/giadung">Gia dụng, máy tính & thiết bị văn phòng</Link></li>
+              <li><Link to="/category/dienthoai">Điện thoại & thiết bị thông minh</Link></li>
+              <li><Link to="/category/kythuatso">Kỹ thuật số & giải trí</Link></li>
+              <li><Link to="/category/suckhoe">Sức khỏe & cá nhân</Link></li>
+              <li><Link to="/category/phukien">Phụ kiện điện máy</Link></li>
             </ul>
           </li>
 
@@ -38,13 +38,13 @@ export default function Header() {
           <li className="dropdown">
             <span>Danh mục</span>
             <ul className="dropdown-menu">
-              <li>Điện tử</li>
-              <li>Điện lạnh</li>
-              <li>Gia dụng, máy tính & thiết bị văn phòng</li>
-              <li>Điện thoại & thiết bị thông minh</li>
-              <li>Kỹ thuật số & giải trí</li>
-              <li>Sức khỏe & cá nhân</li>
-              <li>Phụ kiện điện máy</li>
+              <li><Link to="/category/dientu">Điện tử</Link></li>
+              <li><Link to="/category/dienlanh">Điện lạnh</Link></li>
+              <li><Link to="/category/giadung">Gia dụng, máy tính & thiết bị văn phòng</Link></li>
+              <li><Link to="/category/dienthoai">Điện thoại & thiết bị thông minh</Link></li>
+              <li><Link to="/category/kythuatso">Kỹ thuật số & giải trí</Link></li>
+              <li><Link to="/category/suckhoe">Sức khỏe & cá nhân</Link></li>
+              <li><Link to="/category/phukien">Phụ kiện điện máy</Link></li>
             </ul>
           </li>
 

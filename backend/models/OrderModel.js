@@ -1,11 +1,10 @@
-// models/OrderModel.js
 const db = require("../config/db");
 
 // Tạo đơn hàng
-exports.createOrder = (user_id, total, callback) => {
+exports.createOrder = (user_id, total, name, phone, address, voucher_id, callback) => {
   db.query(
-    "INSERT INTO orders (user_id, total) VALUES (?, ?)",
-    [user_id, total],
+    "INSERT INTO orders (user_id, total, name, phone, address, voucher_id) VALUES (?, ?, ?, ?, ?, ?)",
+    [user_id, total, name, phone, address, voucher_id],
     callback
   );
 };

@@ -1,23 +1,37 @@
-// controllers/orderController.js
 const OrderModel = require("../models/OrderModel");
 
 // POST /api/orders
 exports.createOrder = (req, res) => {
-  const { user_id, items } = req.body;
-  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const { user_id, items, name, phone, address, voucher_id } = req.body;
+  console.log("📦 Payload nhận được:", req.body);
 
-  OrderModel.createOrder(user_id, total, (err, result) => {
-    if (err) return res.status(500).json({ message: "Lỗi server" });
+  if (!user_id || !items || items.length === 0 || !name || !phone || !address) {
+    return res.status(400).json({ message: "Thiếu dữ liệu đơn hàng" });
+  }
+
+  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  console.log("💰 Tổng tiền:", total);
+
+  OrderModel.createOrder(user_id, total, name, phone, address, voucher_id || null, (err, result) => {
+    if (err) {
+      console.error("❌ Lỗi tạo đơn hàng:", err);
+      return res.status(500).json({ message: "Lỗi server khi tạo đơn hàng" });
+    }
 
     const orderId = result.insertId;
+    console.log("🆔 Order ID:", orderId);
+
     OrderModel.addOrderItems(orderId, items, (err2) => {
-      if (err2) return res.status(500).json({ message: "Lỗi server" });
+      if (err2) {
+        console.error("❌ Lỗi thêm sản phẩm:", err2);
+        return res.status(500).json({ message: "Lỗi server khi thêm sản phẩm" });
+      }
       res.status(201).json({ message: "Đơn hàng đã được tạo", orderId });
     });
   });
 };
 
-// GET /api/orders/:userId
+// GET /api/orders/user/:userId
 exports.getOrdersByUser = (req, res) => {
   OrderModel.getOrdersByUser(req.params.userId, (err, results) => {
     if (err) return res.status(500).json({ message: "Lỗi server" });

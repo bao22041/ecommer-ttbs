@@ -45,7 +45,7 @@ export default function WishlistPage() {
                     className="btn btn-sm btn-danger"
                     onClick={() => removeFromWishlist(item.id || item.product_id)}
                   >
-                    ❌ Bỏ yêu thích
+                    ❌ Xóa
                   </button>
                 </td>
               </tr>
